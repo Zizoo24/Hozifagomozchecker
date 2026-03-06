@@ -1,6 +1,7 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { existsSync } from 'fs';
 import { MozApiService } from './mozApi.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,7 +14,9 @@ app.use(express.json());
 
 // Serve built frontend in production
 const distPath = join(__dirname, '..', 'dist');
-app.use(express.static(distPath));
+if (existsSync(distPath)) {
+  app.use(express.static(distPath));
+}
 
 function getCredentials() {
   return {
@@ -104,7 +107,12 @@ app.post('/api/check-urls', async (req, res) => {
 
 // SPA fallback - serve index.html for non-API routes
 app.get('*', (req, res) => {
-  res.sendFile(join(distPath, 'index.html'));
+  const indexPath = join(distPath, 'index.html');
+  if (existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(503).send('App is starting up. Please refresh in a moment.');
+  }
 });
 
 const HOST = process.env.HOST || '0.0.0.0';

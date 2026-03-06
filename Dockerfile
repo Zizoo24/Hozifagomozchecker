@@ -20,6 +20,8 @@ RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY src/server.js src/mozApi.js ./src/
 
-EXPOSE 3001
+ENV PORT=3000
+
+EXPOSE 3000
 
 CMD ["node", "src/server.js"]

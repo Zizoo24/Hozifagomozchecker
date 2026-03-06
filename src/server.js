@@ -18,6 +18,10 @@ if (existsSync(distPath)) {
   app.use(express.static(distPath));
 }
 
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 function getCredentials() {
   return {
     accessId: process.env.MOZ_ACCESS_ID || '',

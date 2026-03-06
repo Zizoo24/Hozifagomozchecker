@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT:-3001}:3001"
+    environment:
+      - PORT=3001
+      - MOZ_ACCESS_ID=${MOZ_ACCESS_ID:-}
+      - MOZ_SECRET_KEY=${MOZ_SECRET_KEY:-}
+    restart: unless-stopped

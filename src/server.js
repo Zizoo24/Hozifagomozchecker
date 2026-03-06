@@ -99,6 +99,15 @@ app.post('/api/check-urls', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Moz API server running on http://localhost:${PORT}`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`Port ${PORT} already in use, server may already be running`);
+    process.exit(0);
+  } else {
+    throw err;
+  }
 });

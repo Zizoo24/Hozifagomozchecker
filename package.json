@@ -8,7 +8,6 @@
   "scripts": {
     "dev": "concurrently \"node src/server.js\" \"vite\"",
     "build": "vite build",
-    "postinstall": "vite build",
     "start": "node src/server.js"
   },
   "dependencies": {

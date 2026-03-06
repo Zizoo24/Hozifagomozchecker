@@ -1,34 +1,20 @@
-import fs from 'fs';
-import path from 'path';
-
 const MOZ_API_URL = 'https://lsapi.seomoz.com/v2/url_metrics';
 
 export class MozApiService {
-  constructor() {
-    this.config = this.loadConfig();
-  }
-
-  loadConfig() {
-    try {
-      const configPath = path.join(process.cwd(), 'moz-config.json');
-      const configData = fs.readFileSync(configPath, 'utf8');
-      return JSON.parse(configData);
-    } catch (error) {
-      console.error('Error loading Moz config:', error.message);
-      return { accessId: '', secretKey: '' };
-    }
+  constructor(accessId, secretKey) {
+    this.accessId = accessId;
+    this.secretKey = secretKey;
   }
 
   getAuthHeader() {
-    const { accessId, secretKey } = this.config;
-    const credentials = `${accessId}:${secretKey}`;
+    const credentials = `${this.accessId}:${this.secretKey}`;
     const base64Credentials = Buffer.from(credentials).toString('base64');
     return `Basic ${base64Credentials}`;
   }
 
   async checkUrls(urls) {
-    if (!this.config.accessId || !this.config.secretKey) {
-      throw new Error('Moz API credentials not configured. Please update moz-config.json');
+    if (!this.accessId || !this.secretKey) {
+      throw new Error('Moz API credentials not configured');
     }
 
     const cleanUrls = urls.map(url => this.cleanUrl(url));

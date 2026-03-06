@@ -1,8 +1,0 @@
-https://example.com
-https://www.google.com
-https://github.com
-https://stackoverflow.com
-https://www.wikipedia.org
-mozilla.org
-reddit.com
-www.amazon.com

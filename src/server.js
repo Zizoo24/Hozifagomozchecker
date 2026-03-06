@@ -31,7 +31,7 @@ function getCredentials() {
 
 function hasValidCredentials(creds) {
   return Boolean(creds.accessId && creds.secretKey &&
-         creds.accessId.length >= 10 && creds.secretKey.length >= 10);
+         creds.accessId.length >= 4 && creds.secretKey.length >= 4);
 }
 
 app.get('/api/config', (req, res) => {
@@ -53,7 +53,7 @@ app.post('/api/config', (req, res) => {
     });
   }
 
-  if (accessId.trim().length < 10 || secretKey.trim().length < 10) {
+  if (accessId.trim().length < 4 || secretKey.trim().length < 4) {
     return res.status(400).json({
       error: 'Invalid credentials format'
     });

@@ -14,14 +14,16 @@ const COLUMNS = {
       <td>Moz</td>`
   },
   semrush: {
-    headers: ['URL', 'Root Domain', 'Authority Score', 'Backlinks', 'Referring Domains', 'Status', 'Provider'],
-    row: r => [r.url, r.rootDomain, r.authorityScore ?? '', r.backlinks ?? '', r.referringDomains ?? '', r.status, r.provider || 'semrush'],
+    headers: ['URL', 'Root Domain', 'Authority Score', 'Organic Traffic', 'Organic Keywords', 'Referring Domains', 'Backlinks', 'Status', 'Provider'],
+    row: r => [r.url, r.rootDomain, r.authorityScore ?? '', r.organicTraffic ?? '', r.organicKeywords ?? '', r.referringDomains ?? '', r.backlinks ?? '', r.status, r.provider || 'semrush'],
     cells: r => `
       <td>${esc(r.url)}</td>
       <td>${esc(r.rootDomain)}</td>
       <td>${r.authorityScore ?? ''}</td>
-      <td>${r.backlinks ?? ''}</td>
+      <td>${r.organicTraffic ?? ''}</td>
+      <td>${r.organicKeywords ?? ''}</td>
       <td>${r.referringDomains ?? ''}</td>
+      <td>${r.backlinks ?? ''}</td>
       <td class="${statusClass(r)}">${r.status}</td>
       <td>Semrush</td>`
   }

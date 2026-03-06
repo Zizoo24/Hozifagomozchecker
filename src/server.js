@@ -23,8 +23,8 @@ function getCredentials() {
 }
 
 function hasValidCredentials(creds) {
-  return creds.accessId && creds.secretKey &&
-         creds.accessId.length >= 10 && creds.secretKey.length >= 10;
+  return Boolean(creds.accessId && creds.secretKey &&
+         creds.accessId.length >= 10 && creds.secretKey.length >= 10);
 }
 
 app.get('/api/config', (req, res) => {
@@ -107,8 +107,9 @@ app.get('*', (req, res) => {
   res.sendFile(join(distPath, 'index.html'));
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`Moz Bulk Checker running on http://localhost:${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+const server = app.listen(PORT, HOST, () => {
+  console.log(`Moz Bulk Checker running on http://${HOST}:${PORT}`);
   const creds = getCredentials();
   if (hasValidCredentials(creds)) {
     console.log('Moz API credentials loaded from environment');

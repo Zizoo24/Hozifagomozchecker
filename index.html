@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moz Bulk URL Checker</title>
+    <title>Bulk URL Checker - Moz &amp; Semrush</title>
     <link rel="stylesheet" href="/src/styles.css">
 </head>
 <body>
@@ -11,8 +11,8 @@
         <header>
             <div class="header-content">
                 <div>
-                    <h1>Moz Bulk URL Checker</h1>
-                    <p class="subtitle">Check Domain Authority, Page Authority, and Spam Score for multiple URLs</p>
+                    <h1>Bulk URL Checker</h1>
+                    <p class="subtitle">Check DA, PA, Spam Score (Moz) or Authority Score, Backlinks (Semrush)</p>
                 </div>
                 <button id="settingsBtn" class="btn btn-icon" title="Settings">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -31,8 +31,17 @@
                     placeholder="https://example.com&#10;https://another-example.com&#10;https://website.org"
                     rows="10"
                 ></textarea>
+                <div class="provider-row">
+                    <label for="providerSelect">Provider:</label>
+                    <select id="providerSelect" class="provider-select">
+                        <option value="auto">Auto-detect</option>
+                        <option value="moz">Moz</option>
+                        <option value="semrush">Semrush</option>
+                    </select>
+                    <span id="providerStatus" class="provider-status"></span>
+                </div>
                 <div class="button-group">
-                    <button id="configureApiBtn" class="btn btn-config">Configure Moz API</button>
+                    <button id="configureApiBtn" class="btn btn-config">Configure API</button>
                     <button id="analyzeBtn" class="btn btn-primary">Analyze URLs</button>
                     <button id="clearBtn" class="btn btn-secondary">Clear</button>
                 </div>
@@ -67,13 +76,7 @@
                 <div class="table-container">
                     <table id="resultsTable">
                         <thead>
-                            <tr>
-                                <th>URL</th>
-                                <th>Root Domain</th>
-                                <th>DA</th>
-                                <th>PA</th>
-                                <th>Spam Score</th>
-                                <th>Status</th>
+                            <tr id="resultsHead">
                             </tr>
                         </thead>
                         <tbody id="resultsBody">
@@ -87,56 +90,71 @@
         </main>
 
         <footer>
-            <p>Click the settings button to configure your Moz API credentials</p>
+            <p>Click Settings to configure your Moz or Semrush API credentials</p>
         </footer>
     </div>
 
     <div id="settingsModal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Moz API Settings</h2>
+                <h2>API Settings</h2>
                 <button id="closeModal" class="btn-close">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="info-box">
-                    <p><strong>Don't have Moz API credentials?</strong></p>
-                    <ol>
-                        <li>Sign up at <a href="https://moz.com/products/api/pricing" target="_blank">Moz API Pricing</a></li>
-                        <li>Get your credentials from <a href="https://moz.com/products/api/keys" target="_blank">API Dashboard</a></li>
-                    </ol>
+                <div class="settings-tabs">
+                    <button class="tab-btn active" data-tab="moz">Moz</button>
+                    <button class="tab-btn" data-tab="semrush">Semrush</button>
                 </div>
 
-                <form id="settingsForm">
-                    <div class="form-group">
-                        <label for="accessId">Access ID:</label>
-                        <input
-                            type="text"
-                            id="accessId"
-                            name="accessId"
-                            placeholder="mozscape-1234567890abcdef"
-                            required
-                        />
+                <div id="mozTab" class="tab-content active">
+                    <div class="info-box">
+                        <p><strong>Don't have Moz API credentials?</strong></p>
+                        <ol>
+                            <li>Sign up at <a href="https://moz.com/products/api/pricing" target="_blank">Moz API Pricing</a></li>
+                            <li>Get your credentials from <a href="https://moz.com/products/api/keys" target="_blank">API Dashboard</a></li>
+                        </ol>
                     </div>
+                    <div id="mozConfigStatus" class="config-badge hidden"></div>
+                    <form id="mozForm">
+                        <div class="form-group">
+                            <label for="accessId">Access ID:</label>
+                            <input type="text" id="accessId" name="accessId" placeholder="mozscape-1234567890abcdef" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="secretKey">Secret Key:</label>
+                            <input type="password" id="secretKey" name="secretKey" placeholder="1234567890abcdef1234567890abcdef" required />
+                            <button type="button" id="toggleSecret" class="btn-toggle">Show</button>
+                        </div>
+                        <div id="mozStatus" class="settings-status hidden"></div>
+                        <div class="modal-footer">
+                            <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Moz Credentials</button>
+                        </div>
+                    </form>
+                </div>
 
-                    <div class="form-group">
-                        <label for="secretKey">Secret Key:</label>
-                        <input
-                            type="password"
-                            id="secretKey"
-                            name="secretKey"
-                            placeholder="1234567890abcdef1234567890abcdef"
-                            required
-                        />
-                        <button type="button" id="toggleSecret" class="btn-toggle">Show</button>
+                <div id="semrushTab" class="tab-content">
+                    <div class="info-box">
+                        <p><strong>Don't have a Semrush API key?</strong></p>
+                        <ol>
+                            <li>Sign up at <a href="https://www.semrush.com/api/" target="_blank">Semrush API</a></li>
+                            <li>Get your API key from your account settings</li>
+                        </ol>
                     </div>
-
-                    <div id="settingsStatus" class="settings-status hidden"></div>
-
-                    <div class="modal-footer">
-                        <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Credentials</button>
-                    </div>
-                </form>
+                    <div id="semrushConfigStatus" class="config-badge hidden"></div>
+                    <form id="semrushForm">
+                        <div class="form-group">
+                            <label for="semrushApiKey">API Key:</label>
+                            <input type="password" id="semrushApiKey" name="apiKey" placeholder="your-semrush-api-key" required />
+                            <button type="button" id="toggleSemrushKey" class="btn-toggle">Show</button>
+                        </div>
+                        <div id="semrushStatus" class="settings-status hidden"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Semrush Key</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

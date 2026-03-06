@@ -18,7 +18,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 COPY --from=build /app/dist ./dist
-COPY src/server.js src/mozApi.js ./src/
+COPY src/server.js src/mozApi.js src/semrushApi.js ./src/
 
 ENV PORT=3000
 

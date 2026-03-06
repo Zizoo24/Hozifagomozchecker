@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moz Bulk URL Checker</title>
+    <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Moz Bulk URL Checker</h1>
+            <p class="subtitle">Check Domain Authority, Page Authority, and Spam Score for multiple URLs</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <label for="urlInput">Enter URLs (one per line):</label>
+                <textarea
+                    id="urlInput"
+                    placeholder="https://example.com&#10;https://another-example.com&#10;https://website.org"
+                    rows="10"
+                ></textarea>
+                <div class="button-group">
+                    <button id="analyzeBtn" class="btn btn-primary">Analyze URLs</button>
+                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
+                </div>
+            </div>
+
+            <div id="loadingState" class="loading-state hidden">
+                <div class="spinner"></div>
+                <p>Analyzing URLs...</p>
+            </div>
+
+            <div id="errorState" class="error-state hidden">
+                <p id="errorMessage"></p>
+            </div>
+
+            <div id="emptyState" class="empty-state hidden">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                    <circle cx="50" cy="50" r="40" stroke="#e0e0e0" stroke-width="4"/>
+                    <path d="M30 50 L45 65 L70 35" stroke="#e0e0e0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h3>No Results Yet</h3>
+                <p>Enter URLs above and click "Analyze URLs" to get started</p>
+            </div>
+
+            <div id="resultsSection" class="results-section hidden">
+                <div class="results-header">
+                    <h2>Results</h2>
+                    <div class="button-group">
+                        <button id="copyBtn" class="btn btn-secondary">Copy Table</button>
+                        <button id="exportBtn" class="btn btn-secondary">Export CSV</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Root Domain</th>
+                                <th>DA</th>
+                                <th>PA</th>
+                                <th>Spam Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="results-footer">
+                    <p id="resultsCount"></p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Configure your Moz API credentials in <code>moz-config.json</code></p>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,69 +1,65 @@
 import express from 'express';
-import { writeFileSync, readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { MozApiService } from './mozApi.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const CONFIG_PATH = join(__dirname, '..', 'moz-config.json');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
 
-app.get('/api/config', (req, res) => {
-  try {
-    const config = JSON.parse(readFileSync(CONFIG_PATH, 'utf8'));
-    const hasCredentials = config.accessId &&
-                          config.secretKey &&
-                          config.accessId !== 'YOUR_MOZ_ACCESS_ID' &&
-                          config.secretKey !== 'YOUR_MOZ_SECRET_KEY';
+// Serve built frontend in production
+const distPath = join(__dirname, '..', 'dist');
+app.use(express.static(distPath));
 
-    res.json({
-      configured: hasCredentials,
-      accessId: hasCredentials ? config.accessId.substring(0, 10) + '...' : null
-    });
-  } catch (error) {
-    res.json({ configured: false });
-  }
+function getCredentials() {
+  return {
+    accessId: process.env.MOZ_ACCESS_ID || '',
+    secretKey: process.env.MOZ_SECRET_KEY || ''
+  };
+}
+
+function hasValidCredentials(creds) {
+  return creds.accessId && creds.secretKey &&
+         creds.accessId.length >= 10 && creds.secretKey.length >= 10;
+}
+
+app.get('/api/config', (req, res) => {
+  const creds = getCredentials();
+  const configured = hasValidCredentials(creds);
+
+  res.json({
+    configured,
+    accessId: configured ? creds.accessId.substring(0, 10) + '...' : null
+  });
 });
 
 app.post('/api/config', (req, res) => {
-  try {
-    const { accessId, secretKey } = req.body;
+  const { accessId, secretKey } = req.body;
 
-    if (!accessId || !secretKey) {
-      return res.status(400).json({
-        error: 'Both Access ID and Secret Key are required'
-      });
-    }
-
-    if (accessId.trim().length < 10 || secretKey.trim().length < 10) {
-      return res.status(400).json({
-        error: 'Invalid credentials format'
-      });
-    }
-
-    const config = {
-      accessId: accessId.trim(),
-      secretKey: secretKey.trim()
-    };
-
-    writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
-
-    res.json({
-      success: true,
-      message: 'Credentials saved successfully'
-    });
-
-  } catch (error) {
-    console.error('Config save error:', error);
-    res.status(500).json({
-      error: 'Failed to save credentials'
+  if (!accessId || !secretKey) {
+    return res.status(400).json({
+      error: 'Both Access ID and Secret Key are required'
     });
   }
+
+  if (accessId.trim().length < 10 || secretKey.trim().length < 10) {
+    return res.status(400).json({
+      error: 'Invalid credentials format'
+    });
+  }
+
+  // Store in process env for the current session
+  process.env.MOZ_ACCESS_ID = accessId.trim();
+  process.env.MOZ_SECRET_KEY = secretKey.trim();
+
+  res.json({
+    success: true,
+    message: 'Credentials saved for this session'
+  });
 });
 
 app.post('/api/check-urls', async (req, res) => {
@@ -82,7 +78,14 @@ app.post('/api/check-urls', async (req, res) => {
       });
     }
 
-    const mozService = new MozApiService();
+    const creds = getCredentials();
+    if (!hasValidCredentials(creds)) {
+      return res.status(400).json({
+        error: 'Moz API credentials not configured. Set MOZ_ACCESS_ID and MOZ_SECRET_KEY environment variables, or enter them in Settings.'
+      });
+    }
+
+    const mozService = new MozApiService(creds.accessId, creds.secretKey);
     const results = await mozService.checkUrls(urls);
 
     res.json({
@@ -99,14 +102,25 @@ app.post('/api/check-urls', async (req, res) => {
   }
 });
 
+// SPA fallback - serve index.html for non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(join(distPath, 'index.html'));
+});
+
 const server = app.listen(PORT, () => {
-  console.log(`Moz API server running on http://localhost:${PORT}`);
+  console.log(`Moz Bulk Checker running on http://localhost:${PORT}`);
+  const creds = getCredentials();
+  if (hasValidCredentials(creds)) {
+    console.log('Moz API credentials loaded from environment');
+  } else {
+    console.log('No Moz API credentials found. Set MOZ_ACCESS_ID and MOZ_SECRET_KEY, or configure in the app.');
+  }
 });
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.log(`Port ${PORT} already in use, server may already be running`);
-    process.exit(0);
+    console.error(`Port ${PORT} already in use`);
+    process.exit(1);
   } else {
     throw err;
   }

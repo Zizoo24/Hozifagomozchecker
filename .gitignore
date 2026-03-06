@@ -1,2 +1,7 @@
 node_modules/
+dist/
 .env
+*.csv
+moz-config.json
+config.json
+urls.txt

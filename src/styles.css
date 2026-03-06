@@ -170,6 +170,105 @@ textarea:focus {
     box-shadow: var(--shadow);
 }
 
+.provider-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.provider-row label {
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.provider-select {
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.provider-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.provider-status {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.provider-status.active {
+    color: var(--success-color);
+}
+
+.provider-status.inactive {
+    color: var(--text-secondary);
+}
+
+.settings-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-color);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.config-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.config-badge.configured {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.config-badge.not-configured {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
 .loading-state,
 .error-state,
 .empty-state {
